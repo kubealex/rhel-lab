@@ -7,7 +7,7 @@ variable hostname {
 variable domain {
   type        = string
   description = "Domain for the virtual machine fqdn"
-  default     = "rheldemo.labs"
+  default     = "rhel.labs"
 }
  
 variable memory {

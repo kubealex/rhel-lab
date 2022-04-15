@@ -1,6 +1,6 @@
 variable "domain" { 
   type = string
-  default = "rheldemo.labs" 
+  default = "rhel.labs" 
 }
 
 variable "network_cidr" {
