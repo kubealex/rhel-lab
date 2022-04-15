@@ -20,18 +20,15 @@ module "libvirt_resources" {
 # Variables
   domain = var.domain
   network_cidr = var.network_cidr
-  libvirt_pool_path = var.libvirt_pool_path
   libvirt_network = var.libvirt_network
   libvirt_pool = var.libvirt_pool
 }
 
-module "rhel_instance" { 
+module "rhel_server" { 
   source = "./modules/01_rhel_server"
   depends_on = [module.libvirt_resources]
   
 # Variables
-  cpu = var.cpu
-  memory = var.memory
   domain = var.domain
   libvirt_network = var.libvirt_network
   libvirt_pool = var.libvirt_pool
