@@ -72,9 +72,7 @@
         path: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.kickstart }}-oemdrv.img"
         size: 1MiB
       loop:
-        - module: 01_centos_server
-          kickstart: centos8
-        - module: 02_rhel_server
+        - module: 01_rhel_server
           kickstart: rhel8
 
     - name: Rebuild Kickstart config
@@ -84,9 +82,7 @@
         opts: -d {{ playbook_dir }}/terraform/kickstart/{{ item.kickstart }} -L OEMDRV
         force: true
       loop:
-        - module: 01_centos_server
-          kickstart: centos8
-        - module: 02_rhel_server
+        - module: 01_rhel_server
           kickstart: rhel8
 
     - name: Provision all terraform resources
@@ -99,7 +95,7 @@
 
     - name: Add Local resolver for the domain
       copy:
-        content: server=/rhdemo.labs/{{ network_cidr | next_nth_usable(1)}}
+        content: server=/rheldemo.labs/{{ network_cidr | next_nth_usable(1)}}
         dest: /etc/NetworkManager/dnsmasq.d/rhdemo.conf
       become: true
     
@@ -117,7 +113,6 @@
         groups:
           - "servers"        
       loop:
-        - centos8-server
         - rhel8-server
 
     - name: Ensure to clean known_hosts
