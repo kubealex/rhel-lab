@@ -4,7 +4,7 @@
     - name: offline_token
       prompt: What is your Offline Token? Leave this empty if you don't want to download ISOS (Check README)
       unsafe: yes
-      private: yes      
+      private: no
   vars:
     checksum:
       rhel8: 1f78e705cd1d8897a05afa060f77d81ed81ac141c2465d4763c0382aa96cadd0
@@ -49,7 +49,7 @@
           url: "{{ installer_url }}"
           dest: "{{ playbook_dir }}/rhel8.iso"
 
-      when: offline_token is defined
+      when: offline_token is defined and offline_token != ""
 
 - name: This play provisions VMs for centos2rhel migration demos
   hosts: localhost
