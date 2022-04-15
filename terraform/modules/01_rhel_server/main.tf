@@ -22,9 +22,9 @@ resource "libvirt_volume" "kickstart_image_rhel8" {
   format = "qcow2"
 }
 
-resource "libvirt_domain" "el8-server" {
+resource "libvirt_domain" "rhel8-server" {
   autostart = true
-  name = "el8-server"
+  name = "rhel8-server"
   memory = var.memory*1024
   vcpu = var.cpu
 

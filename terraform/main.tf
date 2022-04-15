@@ -26,7 +26,7 @@ module "libvirt_resources" {
 }
 
 module "rhel_instance" { 
-  source = "./modules/01_rhel_instance"
+  source = "./modules/01_rhel_server"
   depends_on = [module.libvirt_resources]
   
 # Variables
@@ -36,7 +36,6 @@ module "rhel_instance" {
   libvirt_network = var.libvirt_network
   libvirt_pool = var.libvirt_pool
   disk_size = var.disk_size
-  authorized_key_path = var.authorized_key_path
 }
 
 
