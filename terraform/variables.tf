@@ -7,13 +7,13 @@ variable domain {
 variable libvirt_network {
   type        = string
   description = "Name of libvirt network to be used for the VM"
-  default     = "vm-net"
+  default     = "rhel-net"
 }
 
 variable libvirt_pool {
   type        = string
   description = "Name of libvirt pool to be used for the VM"
-  default     = "vm-pool"
+  default     = "rhel-pool"
 }
 
 variable disk_size {
