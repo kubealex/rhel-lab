@@ -25,7 +25,7 @@ variable cpu {
 variable kickstart_image_rhel8 {
   type        = string
   description = "Path for the kickstart image for RHEL8"
-  default     = "oemdrv-rhel8.img"
+  default     = "rhel8-oemdrv.img"
 }
 
 variable libvirt_network {
