@@ -1,7 +1,7 @@
 variable domain {
   type        = string
   description = "Domain for the virtual machine fqdn"
-  default     = ""
+  default     = "rhel.labs"
 }
 
 variable libvirt_network {
@@ -25,7 +25,7 @@ variable disk_size {
 variable network_cidr {
   type        = list
   description = "Network CIDR for libvirt network definition"
-  default     = ["192.168.222.0/24"]
+  default     = ["192.168.217.0/24"]
 }
 
 variable libvirt_pool_path {
