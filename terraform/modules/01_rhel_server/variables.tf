@@ -1,7 +1,7 @@
 variable hostname {
   type        = string
   description = "Hostname of the VM"
-  default     = "rhel8-server"
+  default     = "rhel-server"
 }
 
 variable domain {
@@ -22,10 +22,10 @@ variable cpu {
   default     = 2
 }
 
-variable kickstart_image_rhel8 {
+variable kickstart_image_rhel {
   type        = string
-  description = "Path for the kickstart image for RHEL8"
-  default     = "rhel8-oemdrv.img"
+  description = "Path for the kickstart image for RHEL"
+  default     = "rhel-oemdrv.img"
 }
 
 variable libvirt_network {
@@ -46,8 +46,8 @@ variable disk_size {
   default     = 30
 }
 
-variable os_image_rhel8 {
+variable os_image_rhel {
   type        = string
   description = "URL/path of the image to be used for the VM provisioning"
-  default     = "rhel8.iso"
+  default     = "rhel.iso"
 }

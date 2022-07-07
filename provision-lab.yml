@@ -6,12 +6,13 @@
       unsafe: yes
       private: no
   vars:
+    rhel_version: 9
     checksum:
-      rhel8: 1f78e705cd1d8897a05afa060f77d81ed81ac141c2465d4763c0382aa96cadd0
+      rhel8: c324f3b07283f9393168f0a4ad2167ebbf7e4699d65c9670e0d9e58ba4e2a9a8
+      rhel9: a387f3230acf87ee38707ee90d3c88f44d7bf579e6325492f562f0f1f9449e89
         
   tasks:
     - block:
-
       - name: Retrieve an access token
         uri:
           url: https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
@@ -23,31 +24,24 @@
           method: POST
         register: response
 
-      - name: Workaround to non-working uri module on success
-        shell: 'curl -H "Authorization: Bearer {{ response.json.access_token }}" https://api.access.redhat.com/management/v1/images/{{ checksum.rhel8 }}/download'
+      - name: Retrieve image download URL
+        ansible.builtin.uri:
+          url: https://api.access.redhat.com/management/v1/images/{{ checksum.rhel8 if ( rhel_version | int == 8 ) else checksum.rhel9 }}/download
+          follow_redirects: no
+          headers:
+            Content-Type: application/json
+            Authorization: 'Bearer {{ response.json.access_token }}'
         register: imageurl
 
-  # HANGING FOREVER
-  #    - name: Retrieve image download URL
-  #      ansible.builtin.uri:
-  #        url: https://api.access.redhat.com/management/v1/images/{{ checksum.rhel8 }}/download
-  #        return_content: true
-  #        follow_redirects: all
-  #        headers:
-  #          Content-Type: application/json
-  #          Authorization: 'Bearer {{ response.json.access_token }}'
-  #          User-Agent: curl/7.61.1
-  #      register: imageurl
       - name: Set result as facts
         ansible.builtin.set_fact:
           installer_url: "{{ (imageurl.stdout | from_json).body.href }}"
           installer_package: "{{(imageurl.stdout | from_json).body.filename }}"
       
-        
       - name: Retrieve RHEL ISO
         get_url:
           url: "{{ installer_url }}"
-          dest: "{{ playbook_dir }}/rhel8.iso"
+          dest: "{{ playbook_dir }}/rhel.iso"
 
       when: offline_token is defined and offline_token != ""
 
@@ -65,7 +59,7 @@
         state: link
       loop:
         - module: 01_rhel_server
-          os: rhel8       
+          os: rhel       
           
     - name: Create a 1Mib file to store kickstart 
       community.general.filesize:
@@ -73,7 +67,7 @@
         size: 1MiB
       loop:
         - module: 01_rhel_server
-          kickstart: rhel8
+          kickstart: rhel
 
     - name: Rebuild Kickstart config
       community.general.filesystem:
@@ -83,7 +77,7 @@
         force: true
       loop:
         - module: 01_rhel_server
-          kickstart: rhel8
+          kickstart: rhel
 
     - name: Provision all terraform resources
       community.general.terraform:
@@ -113,7 +107,7 @@
         groups:
           - "servers"        
       loop:
-        - rhel8-server
+        - rhel-server
 
     - name: Ensure to clean known_hosts
       known_hosts:
