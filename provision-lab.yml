@@ -31,6 +31,9 @@
           headers:
             Content-Type: application/json
             Authorization: 'Bearer {{ response.json.access_token }}'
+          status_code:
+            - 307
+            - 200
         register: imageurl
 
       - name: Set result as facts
