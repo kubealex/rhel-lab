@@ -123,15 +123,11 @@
   hosts: servers
   gather_facts: no
   tasks:
-    # - name: Waiting for installation to end, it can take time!
-    #   wait_for_connection:
-    #     timeout: 1800
-    #     sleep: 120
-    - ansible.builtin.wait_for:
-        port: 22
+    - name: Waiting for installation to end, it can take time!
+      wait_for_connection:
         timeout: 1800
         sleep: 120
-        
+
     - ping:
     
     - name: Setup is ready
