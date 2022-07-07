@@ -39,7 +39,7 @@
       - name: Set result as facts
         ansible.builtin.set_fact:
           installer_url: "{{ imageurl.json.body.href }}"
-          installer_package: "{{ imageurl.json body.filename }}"
+          installer_package: "{{ imageurl.json.body.filename }}"
       
       - name: Retrieve RHEL ISO
         get_url:
