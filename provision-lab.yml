@@ -7,6 +7,12 @@
       private: no
   vars:
     rhel_version: 9
+    domain: rhel.labs
+    modules:
+      - module: 01_rhel_server
+        instance: rhel
+        hostname: rhel-server
+
     checksum:
       rhel8: c324f3b07283f9393168f0a4ad2167ebbf7e4699d65c9670e0d9e58ba4e2a9a8
       rhel9: a387f3230acf87ee38707ee90d3c88f44d7bf579e6325492f562f0f1f9449e89
@@ -58,29 +64,40 @@
     - name: Create symbolic link to RHEL image
       ansible.builtin.file:
         src: "{{ playbook_dir }}/{{ item.os }}.iso"
-        dest: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.os }}.iso"
+        dest: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}.iso"
         state: link
-      loop:
-        - module: 01_rhel_server
-          os: rhel       
+      loop: "{{ modules }}"
           
     - name: Create a 1Mib file to store kickstart 
       community.general.filesize:
-        path: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.kickstart }}-oemdrv.img"
+        path: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}-oemdrv.img"
         size: 1MiB
-      loop:
-        - module: 01_rhel_server
-          kickstart: rhel
+      loop: "{{ modules }}"
 
+
+    - name: Create required folders
+      ansible.builtin.file:
+        state: directory
+        path: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}"
+        recurse: true
+      loop: "{{ modules }}"
+   
+                          
+    - name: Generate kickstart from template
+      ansible.builtin.template:
+        src: ks.cfg.j2
+        dest: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}/ks.cfg"
+      loop: "{{ modules }}"
+    
+      
     - name: Rebuild Kickstart config
       community.general.filesystem:
         fstype: ext2
-        dev: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.kickstart }}-oemdrv.img"
-        opts: -d {{ lookup('ansible.builtin.template', ./item.kickstart) }} -L OEMDRV
+        dev: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}-oemdrv.img"
+        opts: -d {{ playbook_dir }}/terraform/kickstart/{{ item.instance }} -L OEMDRV
         force: true
-      loop:
-        - module: 01_rhel_server
-          kickstart: rhel
+      loop: "{{ modules }}"
+
 
     - name: Provision all terraform resources
       community.general.terraform:
@@ -103,14 +120,14 @@
 
     - name: Add servers to inventory
       ansible.builtin.add_host:
-        hostname: "{{ item }}.rhel.labs"
+        hostname: "{{ item.hostname }}.{{ domain }}"
         ansible_user: root
         ansible_password: redhat
         ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
         groups:
           - "servers"        
-      loop:
-        - rhel-server
+      loop: "{{ modules }}"
+
 
     - name: Ensure to clean known_hosts
       ansible.builtin.known_hosts:
