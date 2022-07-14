@@ -82,7 +82,7 @@
     - name: Generate kickstart from template
       ansible.builtin.template:
         src: ks.cfg.j2
-        dest: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}/ks.cfg"
+        dest: "{{ playbook_dir }}/terraform/kickstart/{{ item.instance }}/ks.cfg"
       loop: "{{ modules }}"
       vars:
         hostname: "{{ item.hostname }}"
