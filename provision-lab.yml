@@ -60,6 +60,12 @@
   vars:
     network_cidr: 192.168.217.0/24
   tasks:
+    - name: Create required folders
+      ansible.builtin.file:
+        state: directory
+        path: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}"
+        recurse: true
+      loop: "{{ modules }}"
 
     - name: Create symbolic link to RHEL image
       ansible.builtin.file:
@@ -73,23 +79,15 @@
         path: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}-oemdrv.img"
         size: 1MiB
       loop: "{{ modules }}"
-
-
-    - name: Create required folders
-      ansible.builtin.file:
-        state: directory
-        path: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}"
-        recurse: true
-      loop: "{{ modules }}"
-   
-                          
+                         
     - name: Generate kickstart from template
       ansible.builtin.template:
         src: ks.cfg.j2
         dest: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}/ks.cfg"
       loop: "{{ modules }}"
-    
-      
+      vars:
+        hostname: "{{ item.hostname }}"
+          
     - name: Rebuild Kickstart config
       community.general.filesystem:
         fstype: ext2
@@ -97,7 +95,6 @@
         opts: -d {{ playbook_dir }}/terraform/kickstart/{{ item.instance }} -L OEMDRV
         force: true
       loop: "{{ modules }}"
-
 
     - name: Provision all terraform resources
       community.general.terraform:
