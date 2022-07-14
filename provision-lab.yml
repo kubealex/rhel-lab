@@ -76,7 +76,7 @@
       community.general.filesystem:
         fstype: ext2
         dev: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.kickstart }}-oemdrv.img"
-        opts: -d {{ playbook_dir }}/terraform/kickstart/{{ item.kickstart }} -L OEMDRV
+        opts: -d {{ lookup('ansible.builtin.template', ./item.kickstart) }} -L OEMDRV
         force: true
       loop:
         - module: 01_rhel_server
