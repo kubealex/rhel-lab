@@ -62,7 +62,7 @@
     - name: Create required folders
       ansible.builtin.file:
         state: directory
-        path: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}"
+        path: "{{ playbook_dir }}/terraform/kickstart/{{ item.instance }}"
         recurse: true
       loop: "{{ modules }}"
 
