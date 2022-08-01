@@ -52,13 +52,34 @@
   hosts: localhost
   become: true
   vars:
-    network_cidr: 192.168.217.0/24
-    domain: rhel.labs
-    modules:
-      - module: 01_rhel_server
-        instance: rhel
-        hostname: rhel-server    
+    network_cidr: 192.168.217.0/24  
   tasks:
+    - name: Ensure required packages are in place
+      yum: 
+        name: "{{ packages }}"
+
+    - name: Ensure libvirtd is running
+      ansible.builtin.service: 
+        name: libvirtd
+        state: started
+        enabled: true
+
+    - name: Ensure libvirt can use root as user
+      replace:
+        path: /etc/libvirt/qemu.conf
+        regexp: "{{ item.regexp }}"
+        replace: "{{ item.line }}"
+      loop:
+        - regexp: '#user = "root"'
+          line: 'user = "root"'
+        - regexp: '#group = "root"'
+          line: 'group = "root"'
+
+    - name: Restart libvirtd service
+      ansible.builtin.service: 
+        name: libvirtd
+        state: restarted
+
     - name: Create required folders
       ansible.builtin.file:
         state: directory
