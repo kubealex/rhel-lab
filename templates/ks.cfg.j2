@@ -10,7 +10,7 @@ bootloader --append="rhgb quiet crashkernel=auto"
 zerombr
 clearpart --all --initlabel
 autopart
-#auth --passalgo=sha512 --useshadow
+auth --passalgo=sha512 --useshadow
 selinux --enforcing
 firewall --enabled
 firstboot --disable
