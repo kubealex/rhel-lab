@@ -1,7 +1,8 @@
 lang en_US
 keyboard --xlayouts='us'
 timezone Etc/GMT --isUtc
-rootpw $2b$10$Nk34juCSPurjzrY.5vtuOeEWec8gVdAZSAXa5afiQFFsoZpBTzk7G --iscrypteduser --name=sysadmin --groups=wheel --password=redhat --plaintext
+rootpw $2b$10$Nk34juCSPurjzrY.5vtuOeEWec8gVdAZSAXa5afiQFFsoZpBTzk7G --iscrypted
+user --name=sysadmin --groups=wheel --password=redhat --plaintext
 #platform x86_64
 cmdline
 reboot
