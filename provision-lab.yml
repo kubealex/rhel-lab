@@ -20,6 +20,7 @@
   tasks:
     - name: Testing role
       ansible.builtin.include_role:
+        name: host-provisioner
       vars:
         host_modules: "{{ modules }}"
 
