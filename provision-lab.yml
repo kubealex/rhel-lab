@@ -3,14 +3,14 @@
   vars_files:
     - lab_vars.yml
   tasks:
-  - name: Include package downloader role
-    ansible.builtin.include_role:
-      name: package-downloader
-    vars:
-      rh_product_filename: rhel.iso
-      rh_product_checksum: "{{ checksum.rhel8 if ( rhel_version | int == 8 ) else checksum.rhel9 }}"
-      rh_api_offline_token: "{{ offline_token }}"
-    when: offline_token is defined and offline_token != ""
+    - name: Include package downloader role
+      ansible.builtin.include_role:
+        name: package-downloader
+      vars:
+        rh_product_filename: rhel.iso
+        rh_product_checksum: "{{ checksum.rhel8 if ( rhel_version | int == 8 ) else checksum.rhel9 }}"
+        rh_api_offline_token: "{{ offline_token }}"
+      when: offline_token is defined and offline_token != ""
 
 - name: This play provisions VMs for RHEL demos
   hosts: localhost
@@ -18,70 +18,10 @@
   vars_files:
     - lab_vars.yml
   tasks:
-    - name: Ensure required packages are in place
-      ansible.builtin.dnf:
-        name: "{{ packages }}"
-        state: latest # noqa package-latest
-
-    - name: Ensure libvirtd is running
-      ansible.builtin.service:
-        name: libvirtd
-        state: started
-        enabled: true
-
-    - name: Ensure libvirt can use root as user
-      ansible.builtin.replace:
-        path: /etc/libvirt/qemu.conf
-        regexp: "{{ item.regexp }}"
-        replace: "{{ item.line }}"
-        mode: 0755
-      loop:
-        - regexp: '#user = "root"'
-          line: 'user = "root"'
-        - regexp: '#group = "root"'
-          line: 'group = "root"'
-
-    - name: Restart libvirtd service
-      ansible.builtin.service:
-        name: libvirtd
-        state: restarted
-
-    - name: Create required folders
-      ansible.builtin.file:
-        state: directory
-        path: "{{ playbook_dir }}/terraform/kickstart/{{ item.instance }}"
-        recurse: true
-      loop: "{{ modules }}"
-
-    - name: Create symbolic link to RHEL image
-      ansible.builtin.file:
-        src: "{{ playbook_dir }}/{{ item.instance }}.iso"
-        dest: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}.iso"
-        state: link
-      loop: "{{ modules }}"
-
-    - name: Create a 1Mib file to store kickstart
-      community.general.filesize:
-        path: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}-oemdrv.img"
-        size: 1MiB
-      loop: "{{ modules }}"
-
-    - name: Generate kickstart from template
-      ansible.builtin.template:
-        src: ks.cfg.j2
-        dest: "{{ playbook_dir }}/terraform/kickstart/{{ item.instance }}/ks.cfg"
-        mode: 0755
-      loop: "{{ modules }}"
+    - name: Testing role
+      ansible.builtin.include_role:
       vars:
-        hostname: "{{ item.hostname }}"
-
-    - name: Rebuild Kickstart config
-      community.general.filesystem:
-        fstype: ext2
-        dev: "{{ playbook_dir }}/terraform/modules/{{ item.module }}/{{ item.instance }}-oemdrv.img"
-        opts: -d {{ playbook_dir }}/terraform/kickstart/{{ item.instance }} -L OEMDRV
-        force: true
-      loop: "{{ modules }}"
+        host_modules: "{{ modules }}"
 
     - name: Provision all terraform resources
       community.general.terraform:

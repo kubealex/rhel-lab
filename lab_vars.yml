@@ -2,4 +2,5 @@ offline_token:
 rhsm_pool_id:
 rhsm_user:
 rhsm_password:
+rhel_version:
 network_cidr: 192.168.211.0/24
