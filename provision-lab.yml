@@ -24,26 +24,6 @@
       vars:
         host_modules: "{{ modules }}"
 
-    - name: Provision all terraform resources
-      community.general.terraform:
-        project_path: "terraform/"
-        force_init: true
-        variables:
-          network_cidr: ' ["{{ network_cidr }}"]'
-        state: present
-
-    - name: Add Local resolver for the domain
-      ansible.builtin.copy:
-        content: server=/rhel.labs/{{ network_cidr | next_nth_usable(1) }}
-        dest: /etc/NetworkManager/dnsmasq.d/rhel.conf
-        mode: 0755
-      become: true
-
-    - name: Restart NetworkManager to reload config
-      ansible.builtin.service:
-        name: NetworkManager
-        state: restarted
-
     - name: Add servers to inventory
       ansible.builtin.add_host:
         hostname: "{{ item.hostname }}.{{ domain }}"
@@ -53,14 +33,6 @@
         groups:
           - "servers"
       loop: "{{ modules }}"
-
-    - name: Ensure to clean known_hosts
-      ansible.builtin.known_hosts:
-        host: "{{ item.hostname }}.{{ domain }}"
-        path: ~/.ssh/known_hosts
-        state: absent
-      loop: "{{ modules }}"
-      become: false
 
 - name: Check connection to servers
   hosts: servers
