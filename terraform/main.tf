@@ -4,7 +4,7 @@ terraform {
   required_providers {
     libvirt = {
       source  = "dmacvicar/libvirt"
-      version = "0.6.14"
+      version = "0.7.0"
       configuration_aliases = [ libvirt ]
     }
   }
@@ -24,10 +24,10 @@ module "libvirt_resources" {
   libvirt_pool = var.libvirt_pool
 }
 
-module "rhel_server" { 
+module "rhel_server" {
   source = "./modules/01_rhel_server"
   depends_on = [module.libvirt_resources]
-  
+
 # Variables
   domain = var.domain
   libvirt_network = var.libvirt_network
