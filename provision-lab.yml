@@ -3,14 +3,16 @@
   vars_files:
     - lab_vars.yml
   tasks:
-    - name: Include package downloader role
+    - name: Include downloader role
       ansible.builtin.include_role:
         name: package-downloader
       vars:
-        rh_product_filename: rhel.iso
-        rh_product_checksum: "{{ checksum.rhel8 if ( rhel_version | int == 8 ) else checksum.rhel9 }}"
+        rh_product_filename: "rhel.iso"
+        rh_product_name: "{{ 'rhel8' if ( rhel_version | int == 8 ) else 'rhel9' }}"
         rh_api_offline_token: "{{ offline_token }}"
-      when: offline_token is defined and offline_token != ""
+      when:
+        - offline_token is defined
+        - offline_token != ""
 
 - name: This play provisions VMs for RHEL demos
   hosts: localhost
